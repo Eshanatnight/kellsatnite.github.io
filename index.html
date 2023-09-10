@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Kellsatnight</title>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Personal Website" />
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+		<link rel="icon" href="favicon.png" type="image/x-icon" />
+		<link rel="stylesheet" href="https://unpkg.com/@sakun/system.css" />
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/xterm@4.19.0/css/xterm.css" />
+		<link rel="stylesheet" href="style.css" />
+
+		<script
+			type="module"
+			src="https://unpkg.com/@google/model-viewer/dist/model-viewer.js"></script>
+		<script src="https://unpkg.com/xterm@4.19.0/lib/xterm.js"></script>
+	</head>
+	<body>
+		<ul role="menu-bar">
+			<li role="menu-item" tabindex="0" aria-haspopup="true">
+				&lt;&gt;
+				<ul role="menu">
+					<li role="menu-item"><a href="#terminal">Terminal</a></li>
+					<li role="menu-item">
+						<a href="https://github.com/Eshanatnight/site"
+							>View Source</a
+						>
+					</li>
+				</ul>
+			</li>
+			<li class="hide" role="menu-item" tabindex="0" aria-haspopup="true">
+				About
+				<ul role="menu">
+					<li role="menu-item" class="divider">
+						<a href="#me">Me</a>
+					</li>
+					<li role="menu-item">
+						<a href="./assets/resume.pdf" target="_blank">Resume</a>
+					</li>
+				</ul>
+			</li>
+			<li role="menu-item" tabindex="0" aria-haspopup="true">
+				Contact
+				<ul role="menu">
+					<li role="menu-item">
+						<a href="mailto:eshan20012@gmail.com" target="_blank"
+							>Email</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://linkedin.com/in/eshanatnite"
+							target="_blank"
+							>LinkedIn</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight"
+							target="_blank"
+							>GitHub</a
+						>
+					</li>
+				</ul>
+			</li>
+			<li role="menu-item" tabindex="0" aria-haspopup="true">
+				Projects
+				<ul role="menu">
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/Sparrow"
+							target="_blank"
+							>Sparrow</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/Oxygen"
+							target="_blank"
+							>Oxygen</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/plus"
+							target="_blank"
+							>Plus</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/WebRTC-Chat"
+							target="_blank"
+							>Chat</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/AQIinator"
+							target="_blank"
+							>AQIinator</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/Robin"
+							target="_blank"
+							>Robin</a
+						>
+					</li>
+					<li role="menu-item" class="divider"></li>
+					<li role="menu-item">
+						<a
+							href="https://dawn-eshanatnight.vercel.app/"
+							target="_blank"
+							>Dawn</a
+						>
+					</li>
+					<li role="menu-item">
+						<a href="https://dusk-neon.vercel.app/" target="_blank"
+							>Dusk</a
+						>
+					</li>
+					<li role="menu-item" class="divider"></li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/terminal-pastebin"
+							target="_blank"
+							>terminal-pastebin</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/Crabby"
+							target="_blank"
+							>Crabby</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/TFTP"
+							target="_blank"
+							>TFTP</a
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/ZeroBuild"
+							target="_blank"
+							>ZeroBuild</a
+						>
+					</li>
+				</ul>
+			</li>
+		</ul>
+
+		<div id="terminal" class="window moveable">
+			<div class="title-bar">
+				<button aria-label="Close" class="close"></button>
+				<h1 class="title">Terminal</h1>
+				<button aria-label="Resize" disabled class="hidden"></button>
+			</div>
+			<div class="separator"></div>
+			<div class="modeless-dialog"></div>
+		</div>
+
+		<div id="model" class="window moveable">
+			<div class="title-bar">
+				<button aria-label="Close" class="close"></button>
+				<h1 class="title">Astronaut</h1>
+				<button aria-label="Resize" disabled class="hidden"></button>
+			</div>
+			<div class="separator"></div>
+
+			<div class="modeless-dialog">
+				<model-viewer
+					style="height: 100%"
+					alt="A 3D model of an astronaut"
+					src="./assets/Astronaut.glb"
+					interaction-prompt="none"
+					exposure="2"
+					auto-rotate
+					preload
+					disable-zoom
+					disable-pan
+					camera-controls>
+					<div slot="progress-bar"></div>
+				</model-viewer>
+			</div>
+		</div>
+
+		<div id="projects" class="window moveable">
+			<div class="title-bar">
+				<button aria-label="Close" class="close"></button>
+				<h1 class="title">Projects</h1>
+				<button aria-label="Resize" disabled class="hidden"></button>
+			</div>
+			<div class="separator"></div>
+
+			<div class="window-pane">
+				<h3>Favorites</h3>
+				<ul>
+					<li>
+						<a
+							href="https://github.com/Eshanatnight/Sparrow"
+							target="_blank"
+							>Sparrow</a
+						><description>
+							A Stack based Programming Language</description
+						>
+					</li>
+					<li>
+						<a
+							href="https://github.com/Eshanatnight/Oxygen"
+							target="_blank"
+							>Oxygen</a
+						><description>
+							A Voice Journal Directly In Your
+							Terminal</description
+						>
+					</li>
+					<li>
+						<a
+							href="https://github.com/Eshanatnight/plus"
+							target="_blank"
+							>Plus</a
+						><description> Setup a C++ Project Faster</description>
+					</li>
+					<li>
+						<a
+							href="https://github.com/Eshanatnight/AQIinator"
+							target="_blank"
+							>AQIinator</a
+						><description>
+							Get the AQI Directly in Your Terminal</description
+						>
+					</li>
+				</ul>
+
+				<h3>Web?</h3>
+				<ul>
+					<li>
+						<a
+							href="https://github.com/Eshanatnight/WebRTC-Chat"
+							target="_blank"
+							>Chat</a
+						><description> A WebRTC Chat app with WASM</description>
+					</li>
+				</ul>
+
+				<h3>Others</h3>
+				<ul>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/Robin"
+							target="_blank"
+							>Robin</a
+						><description> A Toy Html and Css Renderer</description>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/terminal-pastebin"
+							target="_blank"
+							>terminal-pastebin</a
+						><description> Better Way to Send Code</description>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/Crabby"
+							target="_blank"
+							>Crabby</a
+						><description>
+							A fun game straight in your Terminal</description
+						>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/TFTP"
+							target="_blank"
+							>TFTP</a
+						><description> Trivial File Transfer</description>
+					</li>
+					<li role="menu-item">
+						<a
+							href="https://github.com/Eshanatnight/ZeroBuild"
+							target="_blank"
+							>ZeroBuild</a
+						>
+						<description> Build System? Why?</description>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div id="about" class="window moveable">
+			<div class="title-bar">
+				<button aria-label="Close" class="close"></button>
+				<h1 class="title">Eshan Chatterjee</h1>
+				<button aria-label="Resize" disabled class="hidden"></button>
+			</div>
+			<div class="separator"></div>
+
+			<div class="window-pane">
+				<p>
+					Hi there, I'm Eshan! I build software for fun and for a
+					living. I love tinkering with code.
+				</p>
+				<p>
+					Reach out at
+					<a href="mailto:eshan20012@gmail.com"
+						>eshan20012@gmail.com</a
+					>
+					or
+					<a href="https://www.instagram.com/kellsatnight/"
+						>@kellsatnight</a
+					>.
+				</p>
+				<p>
+					While you are here check out the my photography!
+					<a href="https://dusk-neon.vercel.app/">Dusk</a>
+				</p>
+				<!-- <p> -->
+				<!-- 	Check these out! -->
+				<!-- 	<a href="https://dawn-eshanatnight.vercel.app/">Dawn</a> -->
+				<!-- </p> -->
+			</div>
+		</div>
+
+		<script src="script.js"></script>
+		<script src="terminal.js"></script>
+	</body>
+</html>
