@@ -3,16 +3,18 @@ body {
 	padding: 0;
 }
 
+.moveable {
+	margin: 0;
+
+	position: absolute;
+}
+
 .title {
     font-size: 2em;
 }
 
 #sub-heading {
     font-size: 1.5em;
-}
-
-#sub-sub-heading {
-    font-size: 1em;
 }
 
 p {
@@ -47,15 +49,16 @@ li {
 a:hover {
 	border-bottom: 1px dotted #000;
 }
-.col {
-	float: left;
-	width: 50%;
-}
 
 pre[class*="language-"] {
 	padding: 0 !important;
 	/* background-color: #efefef !important; */
 }
+
+.content {
+	padding: 0.5em;
+}
+
 
 
 pre code {
@@ -77,12 +80,6 @@ pre code {
 }
 
 
-#code {
-	height: 27rem;
-	width: 20rem;
-
-	padding-bottom: 0rem;
-}
 
 @media screen and (max-width: 600px) {
 	p, ul {

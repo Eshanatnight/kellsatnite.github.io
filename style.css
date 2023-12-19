@@ -45,6 +45,10 @@ description {
 	padding-bottom: 0rem;
 }
 
+.content {
+	padding-right: 1em;
+}
+
 #code {
 	height: 50rem;
 	width: 65rem;
