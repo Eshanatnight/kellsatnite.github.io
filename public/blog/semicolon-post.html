@@ -24,9 +24,7 @@
 		<div id="projects" class="window moveable">
 			<div class="title-bar">
 				<button aria-label="Close" class="close"></button>
-				<h1 class="title">
-					Building My own scripting language Semicolon: Part 1
-				</h1>
+				<h1 class="title">Making of Semicolon: Part 1</h1>
 				<button aria-label="Resize" disabled class="hidden"></button>
 			</div>
 			<div class="separator"></div>
@@ -88,8 +86,7 @@ def foo(x y) x + y;
 					the next token from standard input. The implementation looks
 					something like this
 				</p>
-				<div class="col">
-					<pre><code style="font-family: Inconsolata,Menlo,Chicago,Geneva;">
+				<pre><code style="font-family: Inconsolata,Menlo,Chicago,Geneva;">
 enum Token {
   tok_eof = -1,
   tok_def = -2,
@@ -105,10 +102,8 @@ enum Token {
   tok_unary = -12,
   tok_var = -13
 };            
-</code></pre>
-				</div>
-				<div class="col">
-					<pre><code style="font-size: 100%;font-family: Inconsolata,Menlo,Chicago,Geneva;">
+
+
 int gettok() {
   int LastChar = &#39; &#39;;
   // Skip any whitespace.
@@ -140,7 +135,6 @@ int gettok() {
   return ThisChar;
 }         
 				</code></pre>
-				</div>
 
 				<h2 id="sub-heading">To Be Continued...</h2>
 				<p>
