@@ -14,7 +14,12 @@
 			rel="stylesheet"
 			href="https://unpkg.com/xterm@4.19.0/css/xterm.css" />
 		<link rel="stylesheet" href="style.css" />
-
+		<link rel="stylesheet" href="prism.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
+			rel="stylesheet" />
 		<script
 			type="module"
 			src="https://unpkg.com/@google/model-viewer/dist/model-viewer.js"></script>
@@ -24,7 +29,7 @@
 		<div id="projects" class="window moveable">
 			<div class="title-bar">
 				<button aria-label="Close" class="close"></button>
-				<h1 class="title">Making of Semicolon: Part 1</h1>
+				<h1 class="title">Making Semicolon: Part 1</h1>
 				<button aria-label="Resize" disabled class="hidden"></button>
 			</div>
 			<div class="separator"></div>
@@ -60,9 +65,11 @@
 					I wanted the Syntax and the grammar to be simple
 					Python-like. So something like this.
 				</p>
-				<pre><code class="language-shell" style="font-family: Inconsolata,Menlo,Chicago,Geneva;">1 + 2;
+				<pre>
+					<code class="language-python">1 + 2;
 def foo(x y) x + y;
-				</code></pre>
+					</code>
+				</pre>
 
 				<h2 id="sub-heading">Implementing the Lexer</h2>
 				<p>
@@ -80,13 +87,10 @@ def foo(x y) x + y;
 					<code>IdentifierStr</code> variable holds the name of the
 					<em><strong>identifier</strong></em
 					>. If the current token is a numeric literal (like 1.0),
-					<code>NumVal</code> holds its value. The actual
-					implementation of the lexer is a single function named
-					<code>gettok</code>. The gettok function is called to return
-					the next token from standard input. The implementation looks
-					something like this
+					<code>NumVal</code> holds its value.
 				</p>
-				<pre><code style="font-family: Inconsolata,Menlo,Chicago,Geneva;">
+				<pre>
+					<code class="language-c">
 enum Token {
   tok_eof = -1,
   tok_def = -2,
@@ -102,8 +106,16 @@ enum Token {
   tok_unary = -12,
   tok_var = -13
 };            
-
-
+					</code>
+				</pre>
+				<p>
+					The actual implementation of the lexer is a single function
+					named <code>gettok</code>. The gettok function is called to
+					return the next token from standard input. The
+					implementation looks something like this
+				</p>
+				<pre>
+					<code class="language-c">
 int gettok() {
   int LastChar = &#39; &#39;;
   // Skip any whitespace.
@@ -134,14 +146,16 @@ int gettok() {
   LastChar = getchar();
   return ThisChar;
 }         
-				</code></pre>
+					</code>
+				</pre>
 
 				<h2 id="sub-heading">To Be Continued...</h2>
 				<p>
 					Its getting pretty long, so how about we continue this with
-					the next post.
+					the next post. Hope to see you all there.
 				</p>
 			</div>
 		</div>
+		<script src="prism.js"></script>
 	</body>
 </html>
