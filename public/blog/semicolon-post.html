@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Kellsatnight</title>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Personal Website" />
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+		<link rel="icon" href="favicon.png" type="image/x-icon" />
+		<link rel="stylesheet" href="https://unpkg.com/@sakun/system.css" />
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/xterm@4.19.0/css/xterm.css" />
+		<link rel="stylesheet" href="style.css" />
+
+		<script
+			type="module"
+			src="https://unpkg.com/@google/model-viewer/dist/model-viewer.js"></script>
+		<script src="https://unpkg.com/xterm@4.19.0/lib/xterm.js"></script>
+	</head>
+	<body>
+		<div id="projects" class="window moveable">
+			<div class="title-bar">
+				<button aria-label="Close" class="close"></button>
+				<h1 class="title">
+					Building My own scripting language Semicolon: Part 1
+				</h1>
+				<button aria-label="Resize" disabled class="hidden"></button>
+			</div>
+			<div class="separator"></div>
+
+			<div class="window-pane">
+				<h2 id="sub-heading">Inspiration</h2>
+				<p>
+					A few months ago I felt, Hey I am getting bored, I want make
+					something, something cool. And started thining about what I
+					could do. I have always been curious about Compilers, how
+					they work. I had some basic knowledge about compilers, from
+					my Compiler Design Class from my 3rd Year in college, and
+					even went on to design a basic stack based programming
+					language. But never did anything that could have been called
+					an actual programming language.
+				</p>
+
+				<h2 id="sub-heading">First Thoughts</h2>
+				<p>
+					After I made up mind on making a programming language and
+					obviously an interpreter for it, I started to think how I am
+					going to do it, at this point I had decided that this
+					programming language will be Abstract Syntax Tree (AST)
+					based. Of course I can not just create a parser and for ever
+					possible instruction, I convert it to it’s corresponding
+					Assembly and then assemble it, that would be far too “Brute
+					Force” in nature. So, I decided I would use LLVM and it
+					compiler frontend architecture.
+				</p>
+
+				<h2 id="sub-heading">Defining the Grammar</h2>
+				<p>
+					I wanted the Syntax and the grammar to be simple
+					Python-like. So something like this.
+				</p>
+				<pre><code class="language-shell" style="font-family: Inconsolata,Menlo,Chicago,Geneva;">1 + 2;
+def foo(x y) x + y;
+				</code></pre>
+
+				<h2 id="sub-heading">Implementing the Lexer</h2>
+				<p>
+					Now with the grammar defined I went on to start the
+					implementation. I started with the Lexer, I had never
+					written a Lexer before, so I started with the simplest thing
+					I could think of, Define the tokens using an enum. Each
+					token returned by our lexer will either be one of the
+					<code>Token</code> <code>enum</code> values or it will be an
+					‘unknown’ character like <code>+</code>, which is returned
+					as its ASCII value.
+				</p>
+				<p>
+					If the current token is an <code>identifier</code>, the
+					<code>IdentifierStr</code> variable holds the name of the
+					<em><strong>identifier</strong></em
+					>. If the current token is a numeric literal (like 1.0),
+					<code>NumVal</code> holds its value. The actual
+					implementation of the lexer is a single function named
+					<code>gettok</code>. The gettok function is called to return
+					the next token from standard input. The implementation looks
+					something like this
+				</p>
+				<div class="col">
+					<pre><code style="font-family: Inconsolata,Menlo,Chicago,Geneva;">
+enum Token {
+  tok_eof = -1,
+  tok_def = -2,
+  tok_extern = -3,
+  tok_identifier = -4,
+  tok_number = -5,
+  tok_if = -6,
+  tok_then = -7,
+  tok_else = -8,
+  tok_for = -9,
+  tok_in = -10,
+  tok_binary = -11,
+  tok_unary = -12,
+  tok_var = -13
+};            
+</code></pre>
+				</div>
+				<div class="col">
+					<pre><code style="font-size: 100%;font-family: Inconsolata,Menlo,Chicago,Geneva;">
+int gettok() {
+  int LastChar = &#39; &#39;;
+  // Skip any whitespace.
+  //....
+  // identifier: [a-zA-Z][a-zA-Z0-9]*
+  if (isalpha(LastChar)) { 
+	IdentifierStr = LastChar;
+	while (isalnum((LastChar = getchar())))
+	  IdentifierStr += LastChar;
+	  // match the token to the identifier
+	  //...
+  }
+  // get the number in a string, then parse it into a double
+  if (isdigit(LastChar) || LastChar == &#39;.&#39;) { 
+	//...
+	return tok_number;
+  }
+  // Comment until end of line.
+  if (LastChar == &#39;#&#39;) {
+	//...
+	if (LastChar != EOF)
+	  return gettok();
+  }
+  // Check for end of file.  Don&#39;t eat the EOF.
+  //..
+  // Otherwise, just return the character as its ascii value.
+  int ThisChar = LastChar;
+  LastChar = getchar();
+  return ThisChar;
+}         
+				</code></pre>
+				</div>
+
+				<h2 id="sub-heading">To Be Continued...</h2>
+				<p>
+					Its getting pretty long, so how about we continue this with
+					the next post.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>
