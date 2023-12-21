@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Kellsatnight</title>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Personal Website" />
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+		<link rel="icon" href="../../favicon.png" type="image/x-icon" />
+		<link rel="stylesheet" href="https://unpkg.com/@sakun/system.css" />
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/xterm@4.19.0/css/xterm.css" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="prism.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
+			rel="stylesheet" />
+		<script
+			type="module"
+			src="https://unpkg.com/@google/model-viewer/dist/model-viewer.js"></script>
+		<script src="https://unpkg.com/xterm@4.19.0/lib/xterm.js"></script>
+	</head>
+	<body>
+		<div id="projects" class="window moveable">
+			<div class="title-bar">
+				<button aria-label="Close" class="close"></button>
+				<h1 class="title">Making Semicolon: Part 2</h1>
+				<button aria-label="Resize" disabled class="hidden"></button>
+			</div>
+			<div class="separator"></div>
+
+			<div class="window-pane">
+				<h1 class="heading">Abstract Syntax Tree</h1>
+				<h2 id="sub-heading">Introduction</h2>
+				<p>
+					The parser we will build uses a combination of Recursive Descent Parsing 
+					and Operator-Precedence Parsing to parse the Semicolon. 
+					But before we get to parsing though, let's talk about the output of the parser: 
+					The Abstract Syntax Tree.
+				</p>
+				<p>
+					The AST for a program captures its behavior in such a way that it is easy for later 
+					stages of the compiler (e.g. code generation) to interpret. 
+					We basically want one object for each construct in the language, 
+					and the AST should closely model the language. 
+					In Semicolon, we have expressions, a prototype, and a function object. 
+				</p>
+
+				<pre>
+					<code class="language-c">
+namespace AST {
+
+	/// ExprAST - Base class for all expression nodes.
+	class ExprAST {
+	public:
+
+	virtual ~ExprAST() = default;
+
+	virtual llvm::Value* codegen() = 0;
+	};
+}
+					</code>
+				</pre>
+				<p>
+					In order to generate LLVM IR, we want some simple setup to get started.
+					The <code>codegen()</code> method says to emit LLVM IR for that AST node 
+					along with all the things it depends on, and they all return an LLVM Value object.
+					“Value” is the class used to represent a “Static Single Assignment (SSA) register” or “SSA value” 
+					in LLVM. 
+					
+					The most distinct aspect of SSA values is that their value is computed as the 
+					related instruction executes, and it does not get a new value until (and if) 
+					the instruction re-executes. 
+					So there is no way to “change” an SSA value. 
+					I highly suggest reading up on Static Single Assignment - the concepts are facinating.
+
+					Note that instead of adding virtual methods to the <code>ExprAST</code> class hierarchy, 
+					it could also make sense to use a visitor pattern or some other way to model this. 
+				</p>
+				<h2 id="sub-heading">Expression Code Generation</h2>
+				<p>
+					Generating LLVM code for expression nodes is very straightforward: less than 45 lines of 
+					commented code for all four of our expression nodes. 
+					I am just adding the code for the <code>NumberExprAST</code> node here, because adding all of them
+					would be too much. You can find the rest of the code on the github <a href="https://github.com/Eshanatnight/semicolon">repo</a>.
+				</p>
+				<pre>
+					<code class="language-c">
+auto AST::PrototypeAST::codegen() -> llvm::Function* {
+	// Make the function type:  double(double,double) etc.
+	std::vector<llvm::Type*> doubles(m_args.size(), llvm::Type::getDoubleTy(*codegen::ctx));
+	llvm::FunctionType* func_type =
+		llvm::FunctionType::get(llvm::Type::getDoubleTy(*codegen::ctx), doubles, false);
+
+	llvm::Function* func = llvm::Function::Create(
+		func_type, llvm::Function::ExternalLinkage, m_name, codegen::module.get());
+
+	// Set names for all arguments.
+	unsigned idx = 0;
+	for(auto& arg: func->args()) {
+		arg.setName(m_args[idx++]);
+	}
+
+	return func;
+}
+					</code>
+				</pre>
+				<p>
+					In the LLVM IR, numeric constants are represented with the ConstantFP class, 
+					which holds the numeric value in an APFloat internally 
+					(APFloat has the capability of holding floating point constants of Arbitrary Precision). 
+					
+					This code basically just creates and returns a ConstantFP. 
+					Note that in the LLVM IR that constants are all uniqued together and shared. 
+					For this reason, the API uses the <code>foo::get(…)</code> idiom instead of 
+					<code>new foo(..)</code> or <code>foo::Create(..)</code>.
+
+					References to variables are also quite simple using LLVM. 
+					In practice, the only values that can be in the NamedValues map are function arguments. 
+					This code simply checks to see that the specified name is in the map 
+					(if not, an unknown variable is being referenced) and returns the value for it, 
+					loop induction variables in the symbol table, and for local variables. 
+				</p>
+				<pre>
+					<code class="language-c">
+auto AST::BinaryExprAST::codegen() -> llvm::Value* {
+	if(m_operator == '=') {
+		AST::VariableExprAST* lhs = static_cast<AST::VariableExprAST*>(m_lhs.get());
+		if(lhs == nullptr) {
+			return Logger::LogErrorV("destination of '=' must be a variable");
+		}
+
+		llvm::Value* val = m_rhs->codegen();
+
+		if(val == nullptr) {
+			return nullptr;
+		}
+
+		llvm::Value* variable = codegen::named_values[lhs->getName()];
+		if(!variable /* == nullptr*/) {
+			return Logger::LogErrorV("Unknown variable name");
+		}
+
+		codegen::builder->CreateStore(val, variable);
+		return val;
+	}
+
+	llvm::Value* left  = m_lhs->codegen();
+	llvm::Value* right = m_rhs->codegen();
+	if(left == nullptr || right == nullptr) {
+		return nullptr;
+	}
+
+	switch(m_operator) {
+	case '+' :
+		return codegen::builder->CreateFAdd(left, right, "addtmp");
+	case '-' :
+		return codegen::builder->CreateFSub(left, right, "subtmp");
+	case '*' :
+		return codegen::builder->CreateFMul(left, right, "multmp");
+	case '<' :
+		left = codegen::builder->CreateFCmpULT(left, right, "cmptmp");
+		return codegen::builder->CreateUIToFP(
+			left, llvm::Type::getDoubleTy(*codegen::ctx), "booltmp");
+
+	default :
+		break;
+	}
+
+	llvm::Function* func = codegen::get_function(std::string("binary") + m_operator);
+	assert(func && "binary operator not found!");
+
+	llvm::Value* ops[2] = { left, right }; // use std:array
+	return codegen::builder->CreateCall(func, ops, "binop");
+}
+					</code>
+				</pre>
+				<p>
+					Code generation for prototypes and functions must handle a number of details, 
+					which make their code less beautiful than expression code generation, 
+					but allows us to illustrate some important points. 
+					First, let's talk about code generation for prototypes: 
+					they are used both for function bodies and external function declarations.
+				</p>
+					<pre>
+						<code class="language-c">
+auto AST::PrototypeAST::codegen() -> llvm::Function* {
+	// Make the function type:  double(double,double) etc.
+	std::vector<llvm::Type*> doubles(m_args.size(), llvm::Type::getDoubleTy(*codegen::ctx));
+	llvm::FunctionType* func_type =
+		llvm::FunctionType::get(llvm::Type::getDoubleTy(*codegen::ctx), doubles, false);
+
+	llvm::Function* func = llvm::Function::Create(
+		func_type, llvm::Function::ExternalLinkage, m_name, codegen::module.get());
+
+	// Set names for all arguments.
+	unsigned idx = 0;
+	for(auto& arg: func->args()) {
+		arg.setName(m_args[idx++]);
+	}
+
+	return func;
+}
+						</code>
+					</pre>
+					<p>
+						This code packs a lot of power into a few lines. 
+						This function returns a “Function*” instead of a “Value*”. 
+						Because a “prototype” really talks about the external interface for a function, 
+						it makes sense for it to return the LLVM Function it corresponds to when codegen'd.
+
+						The call to <code>FunctionType::get</code> creates the FunctionType 
+						that should be used for a given Prototype. 
+						Since all function arguments in Semicolon are of type double, 
+						the first line creates a vector of “N” LLVM double types. 
+						It then uses the <code>FunctionType::get</code> method to create a function type 
+						that takes “N” doubles as arguments, 
+						returns one double as a result, and that is not vararg.
+						Note that Types in LLVM are uniqued just like Constants are, so you don't “new” a type, you “get” it.
+
+						Finally we create the IR Function corresponding to the Prototype. 
+						This indicates the type, linkage and name to use, as well as which module to insert into. 
+						“external linkage” means that the function may be defined outside the current module 
+						and/or that it is callable by functions outside the module. 
+						The Name passed in is the name the user specified: since “TheModule” is specified, 
+						this name is registered in “TheModule”s symbol table.
+					</p>
+					<pre>
+						<code class="language-c">
+auto AST::FunctionAST::codegen() -> llvm::Function* {
+	// Transfer ownership of the prototype to the FunctionProtos map,
+	// but keep a reference to it for use below.
+	auto& proto									  = *m_proto;
+	codegen::function_protos[m_proto->get_name()] = std::move(m_proto);
+	llvm::Function* func						  = codegen::get_function(proto.get_name());
+	if(func == nullptr) {
+		return nullptr;
+	}
+
+	// If this is an operator, install it.
+	if(proto.is_binary_op()) {
+		Parser::binop_precedence[proto.get_operator_name()] = proto.get_binary_precedence();
+	}
+
+	// Create a new basic block to start insertion into.
+	llvm::BasicBlock* basic_block = llvm::BasicBlock::Create(*codegen::ctx, "entry", func);
+	codegen::builder->SetInsertPoint(basic_block);
+
+	// Record the function arguments in the NamedValues map.
+	codegen::named_values.clear();
+	for(auto& arg: func->args()) {
+		// Create an alloca for this variable.
+		llvm::AllocaInst* alloc = codegen::create_entry_block_alloca(func, arg.getName());
+
+		// Store the initial value into the alloca.
+		codegen::builder->CreateStore(&arg, alloc);
+
+		// Add arguments to variable symbol table.
+		codegen::named_values[std::string(arg.getName())] = alloc;
+	}
+
+	if(llvm::Value* ret_val = m_body->codegen()) {
+		// Finish off the function.
+		codegen::builder->CreateRet(ret_val);
+
+		// Validate the generated code, checking for consistency.
+		llvm::verifyFunction(*func);
+
+		// Run the optimizer on the function.
+		codegen::func_pass_manager->run(*func);
+
+		return func;
+	}
+
+	// Error reading body, remove function.
+	func->eraseFromParent();
+
+	if(proto.is_binary_op()) {
+		Parser::binop_precedence.erase(proto.get_operator_name());
+	}
+	return nullptr;
+}
+						</code>
+					</pre>
+					<p>
+						For function definitions, we start by searching TheModule’s symbol table for 
+						an existing version of this function, in case one has already been created using 
+						an ‘extern’ statement. 
+						
+						If <code>Module::getFunction </code> returns null then no previous version exists, 
+						so we’ll codegen one from the Prototype. 
+						
+						In either case, we want to assert that the function is empty (i.e. has no body yet) before we start.
+						Now we get to the point where the Builder is set up. 
+						The first line creates a new basic block (named “entry”), which is inserted 
+						into TheFunction. 
+						The second line then tells the builder that new instructions should be inserted 
+						into the end of the new basic block. 
+						Basic blocks in LLVM are an important part of functions that define the Control Flow Graph.
+
+						So we end up with this syntax!
+					</p>
+					<pre>
+						<code class="language-c">
+extern foo(a);     # ok, defines foo.
+def foo(b) b;      # Error: Unknown variable name. (decl using 'a' takes precedence).
+						</code>
+							</pre>
+				<h2 id="sub-heading">Looking at LLVM IR</h2>
+				<pre>
+					<code class="language-c">
+ready> 4+5;
+Read top-level expression:
+define double @0() {
+entry:
+  ret double 9.000000e+00
+}
+					</code>
+				</pre>
+				<pre>
+					<code class="language-c">
+ready> def foo(a b) a*a + 2*a*b + b*b;
+Read function definition:
+define double @foo(double %a, double %b) {
+entry:
+  %multmp = fmul double %a, %a
+  %multmp1 = fmul double 2.000000e+00, %a
+  %multmp2 = fmul double %multmp1, %b
+  %addtmp = fadd double %multmp, %multmp2
+  %multmp3 = fmul double %b, %b
+  %addtmp4 = fadd double %addtmp, %multmp3
+  ret double %addtmp4
+}
+					</code>
+				</pre>
+
+				<h2 id="sub-heading">End of Chapter 2</h2>
+				<p>
+					I hope you enjoyed this post. I am a newbie to compilers, so I am learning as I go.
+					And an even bigger newbie to writing blog posts, so I forgive me if this post was a bit
+					rough around the edges. I still have a lot to learn and have not gotten a hang of this.
+					
+					But I hope you enjoyed this post and end up wanting to learn something new.
+					The full source code for this project can be found on my github <a href="https://github.com/Eshanatnight/semicolon"> here</a>.
+					Hope to see you in the next post!
+				</p>
+			</div>
+		</div>
+		<script src="prism.js"></script>
+	</body>
+</html>

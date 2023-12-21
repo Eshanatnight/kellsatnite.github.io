@@ -18,7 +18,7 @@ body {
 }
 
 p {
-    font-size: x-large;
+    font-size: medium;
 }
 
 code {
@@ -52,6 +52,7 @@ a:hover {
 
 pre[class*="language-"] {
 	padding: 0 !important;
+	font-size: medium !important;
 	/* background-color: #efefef !important; */
 }
 
@@ -59,7 +60,9 @@ pre[class*="language-"] {
 	padding: 0.5em;
 }
 
-
+.heading {
+	font-size: xx-large !important;
+}
 
 pre code {
 	font-family: 'Fira Code', monospace !important;
