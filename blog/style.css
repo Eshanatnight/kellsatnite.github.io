@@ -9,30 +9,6 @@ body {
 	position: absolute;
 }
 
-.title {
-    font-size: 2em;
-}
-
-#sub-heading {
-    font-size: 1.5em;
-}
-
-p {
-    font-size: medium;
-}
-
-code {
-    font-size: large;
-}
-
-tr {
-    right: 100%;
-}
-
-th {
-    font-size: xx-large;
-}
-
 a {
 	color: #000;
 	text-decoration: none;
@@ -50,6 +26,37 @@ a:hover {
 	border-bottom: 1px dotted #000;
 }
 
+/* For Blog Title */
+.title {
+    font-size: 2em;
+}
+
+/* For Blog Title */
+#sub-heading {
+    font-size: 1.5em;
+}
+
+/* For Blog Content */
+p {
+    font-size: medium;
+}
+
+/* For Blog Table */
+tr {
+    right: 100%;
+}
+
+/* For Blog Table */
+th {
+    font-size: xx-large;
+}
+
+/* For Blog Code */
+code {
+    font-size: large;
+}
+
+/* For Blog Code */
 pre[class*="language-"] {
 	padding: 0 !important;
 	font-size: medium !important;
@@ -75,6 +82,10 @@ pre code {
 
 
 
+
+
+
+
 #blog {
 	height: 70rem;
 	width: 65rem;
@@ -92,6 +103,28 @@ pre code {
 	h1, h2, h3, h4, h5, h6 {
 		font-size: 16px;
 	}
+
+	/* Add Code and content */
+/* 
+	#projects {
+		height: 15rem;
+		width: 20rem;
+
+		padding-bottom: 5rem;
+	}
+
+	#about {
+		width: 10rem;
+	}
+
+	#model {
+		height: 20rem;
+	}
+
+	#terminal {
+		height: 15rem;
+		width: 22.5rem;
+	} */
 
 	.hide {
 		display: none;
